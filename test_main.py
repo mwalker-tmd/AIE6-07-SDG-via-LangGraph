@@ -63,7 +63,29 @@ def test_generate_documents_when_no_cache(mock_get_paths, mock_exists, mock_open
 @patch("main.open", new_callable=mock_open)
 @patch("main.Path.exists", return_value=True)
 @patch("main.get_data_paths", return_value=[("test.html", "test")])  # Mock to return single path
-def test_handle_corrupted_cache(mock_get_paths, mock_exists, mock_open_file, mock_load, mock_dump, mock_extract):
+@patch("pathlib.Path.unlink")  # Add mock for unlink
+def test_handle_corrupted_cache(mock_unlink, mock_get_paths, mock_exists, mock_open_file, mock_load, mock_dump, mock_extract):
+    mock_extract.return_value = [
+        Document(page_content="doc1", metadata={"source": "test", "filename": "fake.html"}),
+        Document(page_content="doc2", metadata={"source": "test", "filename": "fake.html"})
+    ]
+
+    docs = load_or_generate_documents()
+
+    assert len(docs) == 2
+    assert all(isinstance(d, Document) for d in docs)
+    mock_dump.assert_called_once()
+    mock_extract.assert_called_once_with("test.html", "test")
+    mock_unlink.assert_called_once()  # Verify the corrupted file was deleted
+
+
+@patch("main.extract_documents_from_html")
+@patch("main.pickle.dump")
+@patch("main.pickle.load", side_effect=ValueError("Invalid pickle data"))
+@patch("main.open", new_callable=mock_open)
+@patch("main.Path.exists", return_value=True)
+@patch("main.get_data_paths", return_value=[("test.html", "test")])
+def test_handle_general_exception(mock_get_paths, mock_exists, mock_open_file, mock_load, mock_dump, mock_extract):
     mock_extract.return_value = [
         Document(page_content="doc1", metadata={"source": "test", "filename": "fake.html"}),
         Document(page_content="doc2", metadata={"source": "test", "filename": "fake.html"})

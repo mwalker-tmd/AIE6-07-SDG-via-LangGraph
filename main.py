@@ -25,6 +25,8 @@ def load_or_generate_documents() -> list[Document]:
                 return pickle.load(f)
         except EOFError:
             print("⚠️ Cache file is corrupted or empty. Regenerating documents...")
+            if output_file.exists():
+                output_file.unlink()
         except Exception as e:
             print(f"⚠️ Error loading cache: {str(e)}. Regenerating documents...")
 
