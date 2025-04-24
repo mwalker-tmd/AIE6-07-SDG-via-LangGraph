@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 from langchain.schema import Document
 from pathlib import Path
 from typing import List
-import os
 
 
 def extract_documents_from_html(file_path: str, source_label: str) -> List[Document]:
