@@ -5,6 +5,7 @@ from langchain.schema import Document
 """
 Test the HTML to documents conversion functionality
 """
+
 def test_extract_documents_from_html_creates_documents_correctly(tmp_path):
     html_content = """
     <html>
