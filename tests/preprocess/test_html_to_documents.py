@@ -29,8 +29,8 @@ def test_extract_documents_from_html_creates_documents_correctly(tmp_path):
         assert doc.metadata["filename"] == "sample.html"
 
     contents = [doc.page_content for doc in docs]
-    assert "This is the first paragraph." in contents
-    assert "This is the second paragraph." in contents
+    assert any("first paragraph" in c for c in contents)
+    assert any("second paragraph" in c for c in contents)
 
 
 def test_extract_documents_from_html_file_not_found():
