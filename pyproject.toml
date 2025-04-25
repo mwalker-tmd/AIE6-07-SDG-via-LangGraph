@@ -20,7 +20,7 @@ dev = [
     "black",
     "isort",
     "flake8",
-    "mypy"
+    "mypy",
 ]
 
 [tool.pytest.ini_options]
@@ -30,7 +30,10 @@ addopts = [
     "--verbose",
     "--cov=.",
     "--cov-report=term-missing",
-    "--cov-report=html"
+    "--cov-report=html",
+]
+filterwarnings = [
+    "ignore::pydantic.PydanticDeprecatedSince211",
 ]
 pythonpath = ["."]
 
