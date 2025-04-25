@@ -4,6 +4,8 @@ from preprocess.html_to_documents import extract_documents_from_html
 from langchain.schema import Document
 from pathlib import Path
 from graph.types import SDGState
+from preprocess.embed_documents import create_or_load_vectorstore
+from graph.build_graph import build_sdg_graph
 
 
 def is_dev_mode() -> bool:
@@ -47,8 +49,8 @@ def main():
         print("🚧 Running in development mode...")
         docs = load_or_generate_documents()
         print(f"🧾 Loaded {len(docs)} documents for processing.")
-        from graph.build_graph import build_sdg_graph
 
+        vectorstore = create_or_load_vectorstore(docs)
 
         graph = build_sdg_graph(docs)
         initial_state = SDGState(input="How did LLMs evolve in 2023?", documents=docs)
