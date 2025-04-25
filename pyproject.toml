@@ -10,7 +10,8 @@ requires-python = ">=3.9"
 dependencies = [
     "langchain",
     "langgraph",
-    "beautifulsoup4"
+    "beautifulsoup4",
+    "langchain-community"
 ]
 
 [project.optional-dependencies]
@@ -22,6 +23,9 @@ dev = [
     "flake8",
     "mypy",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
 
 [tool.pytest.ini_options]
 testpaths = ["."]

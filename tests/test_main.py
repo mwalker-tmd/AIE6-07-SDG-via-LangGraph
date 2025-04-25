@@ -2,6 +2,7 @@ import os
 import pytest
 from unittest.mock import patch, mock_open
 from langchain.schema import Document
+from main import main
 
 from main import is_dev_mode, get_data_paths, load_or_generate_documents
 
@@ -97,3 +98,19 @@ def test_handle_general_exception(mock_get_paths, mock_exists, mock_open_file, m
     assert all(isinstance(d, Document) for d in docs)
     mock_dump.assert_called_once()
     mock_extract.assert_called_once_with("test.html", "test")
+
+
+@patch("main.build_sdg_graph")
+@patch("main.create_or_load_vectorstore")
+@patch("main.load_or_generate_documents")
+@patch("main.is_dev_mode", return_value=True)
+def test_main_runs_dev_mode(mock_dev, mock_docs, mock_vectorstore, mock_graph):
+    mock_docs.return_value = [Document(page_content="test", metadata={"source": "unit"})]
+    mock_vectorstore.return_value = "mock_vectorstore"
+    mock_graph.return_value.invoke.return_value = {"answer": "Sample result"}
+
+    main()
+
+    mock_docs.assert_called_once()
+    mock_vectorstore.assert_called_once()
+    mock_graph.return_value.invoke.assert_called_once()
