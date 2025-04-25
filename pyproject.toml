@@ -11,7 +11,11 @@ dependencies = [
     "langchain",
     "langgraph",
     "beautifulsoup4",
-    "langchain-community"
+    "langchain-community",
+    "openai",
+    "tiktoken",
+    "langchain-openai",
+    "faiss-cpu"
 ]
 
 [project.optional-dependencies]
