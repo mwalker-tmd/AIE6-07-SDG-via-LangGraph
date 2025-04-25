@@ -23,9 +23,6 @@ dev = [
     "mypy",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["."]
-
 [tool.pytest.ini_options]
 testpaths = ["."]
 python_files = ["test_*.py"]
@@ -35,6 +32,11 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
+filterwarnings = [
+    "ignore::pydantic.PydanticDeprecatedSince211",
+]
+pythonpath = ["."]
+
 
 [tool.black]
 line-length = 88
