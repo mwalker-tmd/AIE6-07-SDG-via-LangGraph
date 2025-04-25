@@ -20,11 +20,8 @@ dev = [
     "black",
     "isort",
     "flake8",
-    "mypy",
+    "mypy"
 ]
-
-[tool.hatch.build.targets.wheel]
-packages = ["."]
 
 [tool.pytest.ini_options]
 testpaths = ["."]
@@ -33,8 +30,10 @@ addopts = [
     "--verbose",
     "--cov=.",
     "--cov-report=term-missing",
-    "--cov-report=html",
+    "--cov-report=html"
 ]
+pythonpath = ["."]
+
 
 [tool.black]
 line-length = 88
