@@ -1,13 +1,20 @@
 from graph.build_graph import build_sdg_graph
 from graph.types import SDGState
 from langchain.schema import Document
+from unittest.mock import MagicMock
 
-def test_graph_compiles_and_invokes():
-    docs = [Document(page_content="A sample document", metadata={"source": "test", "filename": "test.html"})]
-    graph = build_sdg_graph(docs)
-    state = SDGState(input="Test question", documents=docs)
+def test_build_sdg_graph_runs():
+    docs = [Document(page_content="Sample content", metadata={"source": "test", "filename": "test.html"})]
+    mock_vectorstore = MagicMock()
+    mock_vectorstore.similarity_search.return_value = [
+        Document(page_content="Relevant content", metadata={})
+    ]
+
+    graph = build_sdg_graph(docs, mock_vectorstore)
+    state = SDGState(input="Test input", documents=docs)
     result = graph.invoke(state)
-    
+
     assert isinstance(result, dict)
     assert "evolved_question" in result
-    assert result["evolved_question"].startswith("Evolved version of:")
+    assert result["context"]
+    assert "Relevant content" in result["context"][0]
