@@ -177,3 +177,22 @@ cython_debug/
 generated/
 *.pkl
 vectorstore.pkl
+
+# Virtual Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+*.faiss
+
+# HuggingFace
+.huggingface/
