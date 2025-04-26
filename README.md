@@ -1,3 +1,13 @@
+---
+title: TMD-SDG-via-LangGraph
+emoji: 🤖
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # SDG via LangGraph
 
 This project reproduces the RAGAS Synthetic Data Generation steps using LangGraph instead of the Knowledge Graph approach.
