@@ -1,11 +1,29 @@
 import os
 import pickle
+import json
 from preprocess.html_to_documents import extract_documents_from_html
 from langchain.schema import Document
 from pathlib import Path
 from graph.types import SDGState
 from preprocess.embed_documents import create_or_load_vectorstore
 from graph.build_graph import build_sdg_graph
+
+
+class DocumentEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Document):
+            return {
+                "page_content": obj.page_content,
+                "metadata": obj.metadata
+            }
+        if isinstance(obj, SDGState):
+            return {
+                "input": obj.input,
+                "evolved_question": obj.evolved_question,
+                "context": obj.context,
+                "answer": obj.answer
+            }
+        return super().default(obj)
 
 
 def is_dev_mode() -> bool:
@@ -53,9 +71,10 @@ def main():
         vectorstore = create_or_load_vectorstore(docs)
 
         graph = build_sdg_graph(docs, vectorstore)
-        initial_state = SDGState(input="How did LLMs evolve in 2023?", documents=docs)
+        initial_state = SDGState(input="How did LLMs evolve in 2023?")
         result = graph.invoke(initial_state)
-        print("🧠 Agent Output:", result)
+        print("🧠 Agent Output:")
+        print(json.dumps(result, indent=2, ensure_ascii=False, cls=DocumentEncoder))
     else:
         print("🔒 Production mode detected. Skipping document generation.")
 
