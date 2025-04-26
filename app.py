@@ -57,21 +57,21 @@ if st.button("Generate Synthetic Data"):
         st.markdown("### Evolved Questions")
         evolved_questions = [
             {"id": f"q{i}", "question": q, "evolution_type": "simple"} 
-            for i, q in enumerate([result.evolved_question])  # Currently only one question
+            for i, q in enumerate([result["evolved_question"]])  # Currently only one question
         ]
         st.json(evolved_questions)
         
         # Display answers
         st.markdown("### Answers")
         answers = [
-            {"id": "q0", "answer": result.answer}
+            {"id": "q0", "answer": result["answer"]}
         ]
         st.json(answers)
         
         # Display contexts
         st.markdown("### Contexts")
         contexts = [
-            {"id": "q0", "contexts": result.context}
+            {"id": "q0", "contexts": result["context"]}
         ]
         st.json(contexts)
         
