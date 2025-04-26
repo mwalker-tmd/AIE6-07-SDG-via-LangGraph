@@ -1,7 +1,6 @@
 from graph.types import SDGState
 
-
-def retrieve_relevant_context(state: SDGState) -> SDGState:
-    # Placeholder for embedding-based context retrieval (to be added later)
-    state.context = ["Context doc 1", "Context doc 2"]
+def retrieve_relevant_context(state: SDGState, vectorstore) -> SDGState:
+    retrieved_docs = vectorstore.similarity_search(state.evolved_question, k=5)
+    state.context = [doc.page_content for doc in retrieved_docs]
     return state

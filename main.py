@@ -52,7 +52,7 @@ def main():
 
         vectorstore = create_or_load_vectorstore(docs)
 
-        graph = build_sdg_graph(docs)
+        graph = build_sdg_graph(docs, vectorstore)
         initial_state = SDGState(input="How did LLMs evolve in 2023?", documents=docs)
         result = graph.invoke(initial_state)
         print("🧠 Agent Output:", result)
