@@ -5,6 +5,7 @@ from preprocess.html_to_documents import extract_documents_from_html
 from preprocess.embed_documents import create_or_load_vectorstore
 from graph.build_graph import build_sdg_graph
 from graph.types import SDGState
+from langchain_openai import ChatOpenAI
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -37,8 +38,11 @@ def initialize_resources():
     # Create vectorstore
     vectorstore = create_or_load_vectorstore(docs)
     
+    # Initialize LLM client
+    llm = ChatOpenAI(model="gpt-3.5-turbo", openai_api_key=None)  # None will use env var
+    
     # Build graph
-    graph = build_sdg_graph(docs, vectorstore)
+    graph = build_sdg_graph(docs, vectorstore, llm)
     
     st.success("Resources initialized successfully!")
     return docs, vectorstore, graph

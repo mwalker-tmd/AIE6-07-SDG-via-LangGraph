@@ -5,12 +5,12 @@ from graph.nodes.retrieve import retrieve_relevant_context
 from graph.nodes.answer import generate_answer
 
 
-def build_sdg_graph(docs, vectorstore) -> StateGraph:
+def build_sdg_graph(docs, vectorstore, llm) -> StateGraph:
     # Create a new graph with our state type
     builder = StateGraph(SDGState)
 
     # Add nodes with explicit state handling
-    builder.add_node("evolve", evolve_question)
+    builder.add_node("evolve", lambda state: evolve_question(state, llm))
     builder.add_node("retrieve", lambda state: retrieve_relevant_context(state, vectorstore))
     builder.add_node("generate_answer", generate_answer)
 

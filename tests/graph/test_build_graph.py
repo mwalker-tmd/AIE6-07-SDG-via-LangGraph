@@ -9,8 +9,10 @@ def test_build_sdg_graph_runs():
     mock_vectorstore.similarity_search.return_value = [
         Document(page_content="Relevant content", metadata={})
     ]
+    mock_llm = MagicMock()
+    mock_llm.invoke.return_value = MagicMock(content="Evolved test question")
 
-    graph = build_sdg_graph(docs, mock_vectorstore)
+    graph = build_sdg_graph(docs, mock_vectorstore, mock_llm)
     state = SDGState(input="Test input", documents=docs)
     result = graph.invoke(state)
 
