@@ -5,11 +5,15 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 import json
 import numpy as np
+import os
 
 
 def create_or_load_vectorstore(docs: list[Document], path: str = "generated/vectorstore") -> FAISS:
     path = Path(path)
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(
+        model="text-embedding-3-small",
+        openai_api_key=os.getenv("OPENAI_API_KEY")
+    )
     
     if path.exists():
         print("✅ Loading FAISS VectorStore from disk...")
