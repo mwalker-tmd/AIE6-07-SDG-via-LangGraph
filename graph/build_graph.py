@@ -6,16 +6,22 @@ from graph.nodes.answer import generate_answer
 
 
 def build_sdg_graph(docs, vectorstore) -> StateGraph:
+    # Create a new graph with our state type
     builder = StateGraph(SDGState)
 
-    # Add nodes
+    # Add nodes with explicit state handling
     builder.add_node("evolve", evolve_question)
     builder.add_node("retrieve", lambda state: retrieve_relevant_context(state, vectorstore))
     builder.add_node("generate_answer", generate_answer)
 
-    # Define flow
+    # Define the flow
     builder.set_entry_point("evolve")
     builder.add_edge("evolve", "retrieve")
     builder.add_edge("retrieve", "generate_answer")
+    builder.set_finish_point("generate_answer")
 
-    return builder.compile()
+    # Compile the graph
+    graph = builder.compile()
+    
+    # Return the graph
+    return graph
