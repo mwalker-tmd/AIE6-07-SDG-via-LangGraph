@@ -72,7 +72,17 @@ def main():
 
         graph = build_sdg_graph(docs, vectorstore)
         initial_state = SDGState(input="How did LLMs evolve in 2023?")
-        result = graph.invoke(initial_state)
+        
+        # Convert the state to a dictionary with the expected keys
+        state_dict = {
+            "input": initial_state.input,
+            "documents": initial_state.documents,
+            "evolved_question": initial_state.evolved_question,
+            "context": initial_state.context,
+            "answer": initial_state.answer
+        }
+        
+        result = graph.invoke(state_dict)
         print("🧠 Agent Output:")
         print(json.dumps(result, indent=2, ensure_ascii=False, cls=DocumentEncoder))
     else:

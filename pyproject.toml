@@ -15,7 +15,8 @@ dependencies = [
     "openai",
     "tiktoken",
     "langchain-openai",
-    "faiss-cpu"
+    "faiss-cpu",
+    "streamlit"
 ]
 
 [project.optional-dependencies]

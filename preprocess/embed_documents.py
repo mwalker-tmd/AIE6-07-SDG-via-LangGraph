@@ -10,6 +10,8 @@ import os
 
 def create_or_load_vectorstore(docs: list[Document], path: str = "generated/vectorstore") -> FAISS:
     path = Path(path)
+    
+    # Initialize embeddings with minimal configuration
     embeddings = OpenAIEmbeddings(
         model="text-embedding-3-small",
         openai_api_key=os.getenv("OPENAI_API_KEY")
