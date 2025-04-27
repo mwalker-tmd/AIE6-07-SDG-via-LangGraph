@@ -25,11 +25,15 @@ def test_create_vectorstore_when_not_cached(mock_open_file, mock_exists, mock_em
 @patch("preprocess.embed_documents.FAISS.load_local")
 @patch("preprocess.embed_documents.Path.exists", return_value=True)
 @patch("preprocess.embed_documents.open", new_callable=mock_open)
-def test_load_existing_vectorstore(mock_open_file, mock_exists, mock_load_local):
+@patch("preprocess.embed_documents.OpenAIEmbeddings")
+def test_load_existing_vectorstore(mock_embeddings, mock_open_file, mock_exists, mock_load_local):
     mock_vectorstore = MagicMock()
     mock_load_local.return_value = mock_vectorstore
-    
+    mock_embeddings_instance = MagicMock()
+    mock_embeddings.return_value = mock_embeddings_instance
+
     result = create_or_load_vectorstore([], path="tests/tmp/vectorstore.pkl")
     
     assert result == mock_vectorstore
     mock_load_local.assert_called_once()
+    mock_embeddings.assert_called_once()

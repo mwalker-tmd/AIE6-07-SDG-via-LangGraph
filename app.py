@@ -1,9 +1,14 @@
 import streamlit as st
 import json
+import logging
 from preprocess.html_to_documents import extract_documents_from_html
 from preprocess.embed_documents import create_or_load_vectorstore
 from graph.build_graph import build_sdg_graph
 from graph.types import SDGState
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Page config
 st.set_page_config(
@@ -45,10 +50,20 @@ docs, vectorstore, graph = initialize_resources()
 if st.button("Generate Synthetic Data"):
     with st.spinner("Generating synthetic data..."):
         # Create initial state
-        initial_state = SDGState(input="Generate synthetic data about LLM evolution")
+        initial_state = SDGState(
+            input="Generate synthetic data about LLM evolution",
+            documents=[],
+            evolved_question="",
+            context=[],
+            answer=""
+        )
+        logger.debug(f"Initial state before invoke: {initial_state}")
         
-        # Invoke the graph
+        # Invoke the graph with the SDGState object
         result = graph.invoke(initial_state)
+        logger.debug(f"Graph result: {result}")
+        if not isinstance(result, SDGState):
+            result = SDGState(**dict(result))
         
         # Display results
         st.subheader("Generated Data")
@@ -57,21 +72,21 @@ if st.button("Generate Synthetic Data"):
         st.markdown("### Evolved Questions")
         evolved_questions = [
             {"id": f"q{i}", "question": q, "evolution_type": "simple"} 
-            for i, q in enumerate([result["evolved_question"]])  # Currently only one question
+            for i, q in enumerate([result.evolved_question])  # Currently only one question
         ]
         st.json(evolved_questions)
         
         # Display answers
         st.markdown("### Answers")
         answers = [
-            {"id": "q0", "answer": result["answer"]}
+            {"id": "q0", "answer": result.answer}
         ]
         st.json(answers)
         
         # Display contexts
         st.markdown("### Contexts")
         contexts = [
-            {"id": "q0", "contexts": result["context"]}
+            {"id": "q0", "contexts": result.context}
         ]
         st.json(contexts)
         
