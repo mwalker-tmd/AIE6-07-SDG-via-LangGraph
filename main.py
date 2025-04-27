@@ -7,6 +7,7 @@ from pathlib import Path
 from graph.types import SDGState
 from preprocess.embed_documents import create_or_load_vectorstore
 from graph.build_graph import build_sdg_graph
+from langchain_openai import ChatOpenAI
 
 
 class DocumentEncoder(json.JSONEncoder):
@@ -70,7 +71,8 @@ def main():
 
         vectorstore = create_or_load_vectorstore(docs)
 
-        graph = build_sdg_graph(docs, vectorstore)
+        llm = ChatOpenAI(model="gpt-3.5-turbo", openai_api_key=None)  # None will use env var
+        graph = build_sdg_graph(docs, vectorstore, llm)
         initial_state = SDGState(input="How did LLMs evolve in 2023?")
         
         result = graph.invoke(initial_state)

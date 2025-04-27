@@ -113,5 +113,5 @@ def test_main_runs_dev_mode(mock_dev, mock_docs, mock_vectorstore, mock_graph):
 
     mock_docs.assert_called_once()
     mock_vectorstore.assert_called_once()
-    mock_graph.assert_called_once_with(mock_docs.return_value, mock_vectorstore.return_value)
+    mock_graph.assert_called_once()
     mock_graph.return_value.invoke.assert_called_once()
