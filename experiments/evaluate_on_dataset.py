@@ -8,6 +8,7 @@ from preprocess.html_to_documents import extract_documents_from_html
 from langchain_openai import ChatOpenAI
 from pathlib import Path
 import pickle
+import uuid
 
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
@@ -15,6 +16,8 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 # --- CONFIG ---
 DATASET_NAME = "State of AI Across the Years!"
 PROJECT_NAME = "State of AI Across the Years!"
+EXPERIMENT_TAG = f"exp_{uuid.uuid4().hex[:8]}"
+print(f"Experiment tag for this batch: {EXPERIMENT_TAG}")
 
 # --- LOAD DOCUMENTS & VECTORSTORE ---
 def load_docs():
@@ -62,7 +65,9 @@ def main():
             reference_outputs={"answer": reference},
             example_id=example.id,
             project_name=PROJECT_NAME,
+            metadata={"experiment_tag": EXPERIMENT_TAG},
         )
+        print(f"Logged run with experiment_tag: {EXPERIMENT_TAG}")
         print(f"Processed: {question}\n  → {result.answer}\n")
 
 if __name__ == "__main__":

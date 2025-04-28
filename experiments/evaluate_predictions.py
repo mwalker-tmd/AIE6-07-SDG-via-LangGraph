@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 from langsmith.evaluation import LangChainStringEvaluator, evaluate
 from langchain_openai import ChatOpenAI
+import argparse
+from langsmith import Client
 
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
@@ -10,6 +12,20 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 DATASET_NAME = "State of AI Across the Years!"
 PROJECT_NAME = "State of AI Across the Years!"
 EVAL_LLM_MODEL = "gpt-4.1"  # Match the notebook's model if possible
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--experiment_tag", type=str, help="Only evaluate runs with this experiment_tag")
+args = parser.parse_args()
+
+if args.experiment_tag:
+    print(f"Evaluating only runs with experiment_tag: {args.experiment_tag}")
+
+client = Client()
+runs = list(client.list_runs(
+    project_name=PROJECT_NAME,
+    dataset_name=DATASET_NAME,
+    filters={"metadata.experiment_tag": args.experiment_tag} if args.experiment_tag else None,
+))
 
 # --- EVALUATORS ---
 eval_llm = ChatOpenAI(model=EVAL_LLM_MODEL)
@@ -48,7 +64,7 @@ dope_or_nope_evaluator = LangChainStringEvaluator(
 if __name__ == "__main__":
     print("Running evaluation on predictions in LangSmith...")
     results = evaluate(
-        None,  # No need to pass a chain, just evaluate existing runs
+        runs,
         data=DATASET_NAME,
         evaluators=[
             qa_evaluator,
