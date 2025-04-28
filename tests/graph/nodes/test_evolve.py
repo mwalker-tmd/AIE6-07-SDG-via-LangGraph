@@ -55,3 +55,39 @@ def test_evolve_question_three_passes():
         call("Rewrite or evolve the following question to be more challenging or insightful:\n\nCreative: What were the top LLMs in 2023?")
     ]
     mock_llm.invoke.assert_has_calls(expected_calls)
+
+def test_evolved_questions_list_populated_correctly():
+    state = SDGState(input="Base question", num_evolve_passes=3)
+    mock_llm = MagicMock()
+    mock_llm.invoke.side_effect = [
+        MagicMock(content="Challenging: Base question"),
+        MagicMock(content="Creative: Challenging: Base question"),
+        MagicMock(content="Challenging Again: Creative: Challenging: Base question")
+    ]
+    updated_state = evolve_question(state, mock_llm)
+    # The evolved_questions list should contain the initial input plus one entry per pass
+    assert updated_state.evolved_questions == [
+        "Base question",
+        "Challenging: Base question",
+        "Creative: Challenging: Base question",
+        "Challenging Again: Creative: Challenging: Base question"
+    ]
+    # The property should return the last one
+    assert updated_state.evolved_question == "Challenging Again: Creative: Challenging: Base question"
+
+def test_evolved_questions_list_with_existing_evolutions():
+    # If the state already has evolved_questions, it should continue from the last
+    state = SDGState(input="Base question", evolved_questions=["Base question", "First evolution"], num_evolve_passes=2)
+    mock_llm = MagicMock()
+    mock_llm.invoke.side_effect = [
+        MagicMock(content="Second evolution"),
+        MagicMock(content="Third evolution")
+    ]
+    updated_state = evolve_question(state, mock_llm)
+    assert updated_state.evolved_questions == [
+        "Base question",
+        "First evolution",
+        "Second evolution",
+        "Third evolution"
+    ]
+    assert updated_state.evolved_question == "Third evolution"

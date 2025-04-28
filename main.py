@@ -20,6 +20,7 @@ class DocumentEncoder(json.JSONEncoder):
         if isinstance(obj, SDGState):
             return {
                 "input": obj.input,
+                "evolved_questions": obj.evolved_questions,
                 "evolved_question": obj.evolved_question,
                 "context": obj.context,
                 "answer": obj.answer

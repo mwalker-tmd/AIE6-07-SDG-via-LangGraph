@@ -17,6 +17,8 @@ def test_build_sdg_graph_runs():
     result = graph.invoke(state)
 
     assert isinstance(result, dict)
-    assert "evolved_question" in result
+    assert "evolved_questions" in result
+    if result["evolved_questions"]:
+        assert result["evolved_questions"][-1] == "Evolved test question"
     assert result["context"]
     assert "Relevant content" in result["context"][0]
