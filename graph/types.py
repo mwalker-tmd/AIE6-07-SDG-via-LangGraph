@@ -8,3 +8,4 @@ class SDGState(BaseModel):
     evolved_question: str = Field(default="")
     context: List[str] = Field(default_factory=list)
     answer: str = Field(default="")
+    num_evolve_passes: int = Field(default=2)

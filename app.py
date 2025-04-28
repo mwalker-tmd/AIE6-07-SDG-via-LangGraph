@@ -52,6 +52,16 @@ def initialize_resources():
 # Initialize resources
 docs, vectorstore, graph = initialize_resources()
 
+# Add a number input for evolution passes
+num_evolve_passes = st.number_input(
+    label="Number of Evolution Passes",
+    min_value=1,
+    max_value=10,
+    value=2,
+    step=1,
+    help="How many times to evolve the question (alternates between challenging and creative prompts)."
+)
+
 # Generate synthetic data button
 if st.button("Generate Synthetic Data"):
     with st.spinner("Generating synthetic data..."):
@@ -61,11 +71,12 @@ if st.button("Generate Synthetic Data"):
             documents=[],
             evolved_question="",
             context=[],
-            answer=""
+            answer="",
+            num_evolve_passes=num_evolve_passes
         )
         logger.debug(f"Initial state before invoke: {initial_state}")
         
-        # Invoke the graph with the SDGState object
+        # Pass num_evolve_passes to the graph (assume graph.invoke can accept it via state or kwargs)
         result = graph.invoke(initial_state)
         logger.debug(f"Graph result: {result}")
         if not isinstance(result, SDGState):
