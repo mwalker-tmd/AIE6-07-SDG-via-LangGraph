@@ -14,7 +14,7 @@ def create_or_load_vectorstore(docs: list[Document], path: str = "generated/vect
     # Initialize embeddings with minimal configuration
     embeddings = OpenAIEmbeddings(
         model="text-embedding-3-small",
-        openai_api_key=os.getenv("OPENAI_API_KEY")
+        openai_api_key=os.getenv("OPENAI_API_KEY").strip() if os.getenv("OPENAI_API_KEY") else None
     )
     
     if path.exists():

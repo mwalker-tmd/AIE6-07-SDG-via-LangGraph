@@ -69,7 +69,8 @@ def main():
         docs = load_or_generate_documents()
         print(f"🧾 Loaded {len(docs)} documents for processing.")
 
-        vectorstore = create_or_load_vectorstore(docs)
+        vectorstore_path = os.environ.get("VECTORSTORE_PATH", "/tmp/vectorstore")
+        vectorstore = create_or_load_vectorstore(docs, path=vectorstore_path)
 
         llm = ChatOpenAI(model="gpt-3.5-turbo", openai_api_key=None)  # None will use env var
         graph = build_sdg_graph(docs, vectorstore, llm)
