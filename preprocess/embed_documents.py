@@ -8,13 +8,15 @@ import numpy as np
 import os
 
 
-def create_or_load_vectorstore(docs: list[Document], path: str = "generated/vectorstore") -> FAISS:
+def create_or_load_vectorstore(docs: list[Document], path: str = None) -> FAISS:
+    if path is None:
+        path = os.environ.get("VECTORSTORE_PATH", "/tmp/vectorstore")
     path = Path(path)
     
     # Initialize embeddings with minimal configuration
     embeddings = OpenAIEmbeddings(
         model="text-embedding-3-small",
-        openai_api_key=os.getenv("OPENAI_API_KEY")
+        openai_api_key=os.getenv("OPENAI_API_KEY").strip()
     )
     
     if path.exists():

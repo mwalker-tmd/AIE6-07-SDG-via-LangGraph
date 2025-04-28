@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import logging
+import os
 from preprocess.html_to_documents import extract_documents_from_html
 from preprocess.embed_documents import create_or_load_vectorstore
 from graph.build_graph import build_sdg_graph
@@ -36,7 +37,8 @@ def initialize_resources():
         docs.extend(extract_documents_from_html(html_file, label))
     
     # Create vectorstore
-    vectorstore = create_or_load_vectorstore(docs)
+    vectorstore_path = os.environ.get("VECTORSTORE_PATH", "/tmp/vectorstore")
+    vectorstore = create_or_load_vectorstore(docs, path=vectorstore_path)
     
     # Initialize LLM client
     llm = ChatOpenAI(model="gpt-3.5-turbo", openai_api_key=None)  # None will use env var
