@@ -12,4 +12,4 @@ class SDGState(BaseModel):
 
     @property
     def evolved_question(self):
-        return self.evolved_questions[-1] if self.evolved_questions else ""
+        return self.evolved_questions[-1] if self.evolved_questions else self.input
