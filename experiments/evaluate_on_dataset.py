@@ -15,15 +15,6 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 # --- CONFIG ---
 DATASET_NAME = "State of AI Across the Years!"
 PROJECT_NAME = "State of AI Across the Years!"
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-LANGCHAIN_API_KEY = os.environ.get("LANGCHAIN_API_KEY")
-
-# --- SETUP ENV ---
-os.environ["LANGCHAIN_PROJECT"] = PROJECT_NAME
-if LANGCHAIN_API_KEY:
-    os.environ["LANGCHAIN_API_KEY"] = LANGCHAIN_API_KEY
-if OPENAI_API_KEY:
-    os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 # --- LOAD DOCUMENTS & VECTORSTORE ---
 def load_docs():

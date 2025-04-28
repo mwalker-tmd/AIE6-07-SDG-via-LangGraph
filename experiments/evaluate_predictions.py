@@ -11,12 +11,6 @@ DATASET_NAME = "State of AI Across the Years!"
 PROJECT_NAME = "State of AI Across the Years!"
 EVAL_LLM_MODEL = "gpt-4.1"  # Match the notebook's model if possible
 
-# --- SETUP ENV ---
-if "LANGCHAIN_API_KEY" in os.environ:
-    os.environ["LANGCHAIN_API_KEY"] = os.environ["LANGCHAIN_API_KEY"]
-if "OPENAI_API_KEY" in os.environ:
-    os.environ["OPENAI_API_KEY"] = os.environ["OPENAI_API_KEY"]
-
 # --- EVALUATORS ---
 eval_llm = ChatOpenAI(model=EVAL_LLM_MODEL)
 
