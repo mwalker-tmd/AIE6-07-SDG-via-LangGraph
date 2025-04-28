@@ -14,9 +14,10 @@ def retrieve_relevant_context(state: SDGState, vectorstore) -> SDGState:
     new_state = SDGState(
         input=state.input,
         documents=state.documents,
-        evolved_question=state.evolved_question,
+        evolved_questions=state.evolved_questions,
         context=[doc.page_content for doc in retrieved_docs],
-        answer=state.answer
+        answer=state.answer,
+        num_evolve_passes=state.num_evolve_passes
     )
     
     logger.debug(f"Retrieve node returning state: {new_state}")

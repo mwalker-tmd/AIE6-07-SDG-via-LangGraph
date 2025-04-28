@@ -52,24 +52,46 @@ def initialize_resources():
 # Initialize resources
 docs, vectorstore, graph = initialize_resources()
 
+# Add a number input for evolution passes
+num_evolve_passes = st.number_input(
+    label="Number of Evolution Passes",
+    min_value=1,
+    max_value=10,
+    value=2,
+    step=1,
+    help="How many times to evolve the question (alternates between challenging and creative prompts)."
+)
+
 # Generate synthetic data button
 if st.button("Generate Synthetic Data"):
     with st.spinner("Generating synthetic data..."):
         # Create initial state
-        initial_state = SDGState(
+        state = SDGState(
             input="Generate synthetic data about LLM evolution",
             documents=[],
-            evolved_question="",
+            evolved_questions=[],
             context=[],
-            answer=""
+            answer="",
+            num_evolve_passes=num_evolve_passes
         )
-        logger.debug(f"Initial state before invoke: {initial_state}")
         
-        # Invoke the graph with the SDGState object
-        result = graph.invoke(initial_state)
-        logger.debug(f"Graph result: {result}")
-        if not isinstance(result, SDGState):
-            result = SDGState(**dict(result))
+        # Run the graph for each evolution pass
+        all_results = []
+        for i in range(num_evolve_passes):
+            logger.debug(f"Running evolution pass {i+1}/{num_evolve_passes}")
+            result = graph.invoke(state)
+            if not isinstance(result, SDGState):
+                result = SDGState(**dict(result))
+            all_results.append(result)
+            # Update state for next iteration with evolved questions
+            state = SDGState(
+                input=state.input,
+                documents=state.documents,
+                evolved_questions=result.evolved_questions,  # Pass forward all evolved questions
+                context=[],  # Reset context for next iteration
+                answer="",   # Reset answer for next iteration
+                num_evolve_passes=num_evolve_passes
+            )
         
         # Display results
         st.subheader("Generated Data")
@@ -77,22 +99,24 @@ if st.button("Generate Synthetic Data"):
         # Display evolved questions
         st.markdown("### Evolved Questions")
         evolved_questions = [
-            {"id": f"q{i}", "question": q, "evolution_type": "simple"} 
-            for i, q in enumerate([result.evolved_question])  # Currently only one question
+            {"id": f"q{i}", "question": result.evolved_questions[-1], "evolution_type": "simple"}
+            for i, result in enumerate(all_results)
         ]
         st.json(evolved_questions)
         
         # Display answers
         st.markdown("### Answers")
         answers = [
-            {"id": "q0", "answer": result.answer}
+            {"id": f"q{i}", "answer": result.answer}
+            for i, result in enumerate(all_results)
         ]
         st.json(answers)
         
         # Display contexts
         st.markdown("### Contexts")
         contexts = [
-            {"id": "q0", "contexts": result.context}
+            {"id": f"q{i}", "contexts": result.context}
+            for i, result in enumerate(all_results)
         ]
         st.json(contexts)
         

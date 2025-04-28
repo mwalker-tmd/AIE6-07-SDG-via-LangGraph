@@ -20,6 +20,7 @@ class DocumentEncoder(json.JSONEncoder):
         if isinstance(obj, SDGState):
             return {
                 "input": obj.input,
+                "evolved_questions": obj.evolved_questions,
                 "evolved_question": obj.evolved_question,
                 "context": obj.context,
                 "answer": obj.answer
@@ -63,6 +64,27 @@ def load_or_generate_documents() -> list[Document]:
     return docs
 
 
+def format_results(all_results):
+    """Format results into the standard JSON structure."""
+    evolved_questions = [
+        {"id": f"q{i}", "question": result.evolved_questions[-1], "evolution_type": "simple"}
+        for i, result in enumerate(all_results)
+    ]
+    answers = [
+        {"id": f"q{i}", "answer": result.answer}
+        for i, result in enumerate(all_results)
+    ]
+    contexts = [
+        {"id": f"q{i}", "contexts": result.context}
+        for i, result in enumerate(all_results)
+    ]
+    return {
+        "evolved_questions": evolved_questions,
+        "answers": answers,
+        "contexts": contexts
+    }
+
+
 def main():
     if is_dev_mode():
         print("🚧 Running in development mode...")
@@ -74,11 +96,50 @@ def main():
 
         llm = ChatOpenAI(model="gpt-3.5-turbo", openai_api_key=None)  # None will use env var
         graph = build_sdg_graph(docs, vectorstore, llm)
-        initial_state = SDGState(input="How did LLMs evolve in 2023?")
         
-        result = graph.invoke(initial_state)
-        print("🧠 Agent Output:")
-        print(json.dumps(result, indent=2, ensure_ascii=False, cls=DocumentEncoder))
+        # Set up initial state with desired number of passes
+        num_evolve_passes = int(os.environ.get("NUM_EVOLVE_PASSES", "2"))
+        state = SDGState(
+            input="How did LLMs evolve in 2023?",
+            documents=[],
+            evolved_questions=[],
+            context=[],
+            answer="",
+            num_evolve_passes=num_evolve_passes
+        )
+        
+        # Run the graph for each evolution pass
+        all_results = []
+        print(f"🔄 Running {num_evolve_passes} evolution passes...")
+        for i in range(num_evolve_passes):
+            print(f"\n📝 Evolution pass {i+1}/{num_evolve_passes}:")
+            result = graph.invoke(state)
+            if not isinstance(result, SDGState):
+                result = SDGState(**dict(result))
+            all_results.append(result)
+            # Update state for next iteration with evolved questions
+            state = SDGState(
+                input=state.input,
+                documents=state.documents,
+                evolved_questions=result.evolved_questions,  # Pass forward all evolved questions
+                context=[],  # Reset context for next iteration
+                answer="",   # Reset answer for next iteration
+                num_evolve_passes=num_evolve_passes
+            )
+            print(f"  Question: {result.evolved_questions[-1]}")
+            print(f"  Answer: {result.answer[:100]}...")
+        
+        # Format and output results
+        print("\n🧠 Final Output:")
+        results = format_results(all_results)
+        print(json.dumps(results, indent=2, ensure_ascii=False, cls=DocumentEncoder))
+        
+        # Save results to file
+        output_file = Path("generated/results.json")
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(results, f, indent=2, ensure_ascii=False, cls=DocumentEncoder)
+        print(f"\n💾 Results saved to {output_file}")
     else:
         print("🔒 Production mode detected. Skipping document generation.")
 
